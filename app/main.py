@@ -44,78 +44,10 @@ logger = logging.getLogger(__name__)
 
 
 @asynccontextmanager
-async def lifespan(app: FastAPI) -> AsyncIterator[None]:
-    """
-    Lifespan-Context für Startup / Shutdown.
-
-    - Initialisiert die DB-Verbindung.
-    - Hängt die DB-Instanz an app.state, damit sie in Dependencies
-      und Services verwendet werden kann.
-    - Registriert CRM-Sync-Handler am EventBus.
-    """
-    logger.info("Starte LeadLane API – Environment: %s", settings.environment)
-
-    # Datenbank initialisieren
-    app.state.db = Database(dsn=settings.database_url)
-
-    try:
-        # -------------------- Startup -------------------- #
-        await app.state.db.connect()
-        logger.info("Datenbankverbindung aufgebaut.")
-
-        # -------------------------------------------------- #
-        # CRM Sync Wiring (EventBus -> CRMSyncListener)      #
-        # -------------------------------------------------- #
-        db = app.state.db
-
-        # Repos + Engine instanziieren (analog zu dependencies.py)
-        crm_field_mappings_repo = CRMFieldMappingsRepository(db)
-        crm_field_mapping_engine = CRMFieldMappingEngine(crm_field_mappings_repo)
-
-        account_links_repo = CRMAccountLinksRepository(db)
-        contact_links_repo = CRMContactLinksRepository(db)
-        opportunity_links_repo = CRMOpportunityLinksRepository(db)
-
-        credentials_store = CRMCredentialsStore(db)
-
-        crm_sync_service = CRMSyncService(
-            credentials_store=credentials_store,
-            mapping_engine=crm_field_mapping_engine,
-            account_links_repo=account_links_repo,
-            contact_links_repo=contact_links_repo,
-            opportunity_links_repo=opportunity_links_repo,
-        )
-
-        crm_sync_listener = CRMSyncListener(
-            sync_service=crm_sync_service,
-            credentials_store=credentials_store,
-        )
-
-        company_repository = CompanyRepository(db)
-
-        company_updated_handler = make_company_updated_handler(
-            crm_sync_listener=crm_sync_listener,
-            company_repository=company_repository,
-        )
-
-        event_bus.subscribe(CompanyUpdatedEvent, company_updated_handler)
-        logger.info("CompanyUpdatedEvent -> CRM Sync Handler registriert.")
-
-        # App läuft
-        yield
-
-    except Exception:
-        logger.exception("Fehler im Lifespan-Startup.")
-        # Optional: raise, wenn du hart abbrechen willst
-        raise
-    finally:
-        # -------------------- Shutdown -------------------- #
-        try:
-            await app.state.db.disconnect()
-            logger.info("Datenbankverbindung sauber geschlossen.")
-        except Exception:
-            logger.exception("Fehler beim Schließen der Datenbankverbindung.")
-
+async def lifespan(app: FastAPI):
+    # We are NOT using the local Postgres database.
+    # Do NOT connect/disconnect at startup to avoid asyncpg errors.
+    yield
 
 def create_app() -> FastAPI:
     app = FastAPI(

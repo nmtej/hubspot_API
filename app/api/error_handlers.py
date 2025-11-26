@@ -18,7 +18,7 @@ async def http_exception_handler(request: Request, exc: StarletteHTTPException):
     )
     return JSONResponse(
         status_code=exc.status_code,
-        content=ErrorResponse(error=error, trace_id=trace_id).model_dump(),
+        content=ErrorResponse(error=error, trace_id=trace_id).dict(),
     )
 
 
@@ -42,7 +42,7 @@ async def validation_exception_handler(
 
     return JSONResponse(
         status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-        content=ErrorResponse(error=error, trace_id=trace_id).model_dump(),
+        content=ErrorResponse(error=error, trace_id=trace_id).dict(),
     )
 
 
