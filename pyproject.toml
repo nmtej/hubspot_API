@@ -1,0 +1,70 @@
+[tool.poetry]
+name = "leadlane-integration-api"
+version = "0.1.0"
+description = "Asynchrone LeadLane API zur Synchronisation mit verschiedenen CRM-Systemen (HubSpot, Salesforce, SAP B1, Pipedrive) auf Basis eines Unified Data Models."
+authors = ["LeadLane UG <info@leadlane.de>"]
+license = "Proprietary"
+readme = "README.md"
+packages = [{ include = "app" }]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+
+# --- Web Framework ---
+fastapi = "0.110.1"
+uvicorn = { version = "0.29.0", extras = ["standard"] }
+
+# --- Async Postgres (Supabase/Postgres) ---
+asyncpg = "0.29.0"
+
+# --- HTTP Client (CRM Integrationen) ---
+httpx>=0.24
+
+# --- Settings / Validation ---
+pydantic = "^1.10.0"          # v1, weil Settings/BaseSettings darauf basieren
+python-dotenv = "^1.0.1"
+
+# --- Supabase Client (für Scripts / Tools) ---
+supabase = "^2.4.0"
+
+# --- Utilities ---
+pandas = "^2.2.1"
+typing-extensions = "^4.10.0"
+
+# --- Optional: Token/JWT-Handling (z.B. OAuth / JWT) ---
+python-jose = "^3.3.0"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.2.0"
+pytest-asyncio = "^0.23.0"
+requests = "^2.32.0"
+black = "^24.4.0"
+isort = "^5.13.0"
+mypy = "^1.10.0"
+
+[tool.black]
+line-length = 88
+target-version = ["py310"]
+exclude = """
+/(
+    \.git
+  | \.venv
+  | build
+  | dist
+)/
+"""
+
+[tool.isort]
+profile = "black"
+line_length = 88
+known_first_party = ["app"]
+multi_line_output = 3
+include_trailing_comma = true
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+
+[build-system]
+requires = ["poetry-core>=1.8.0"]
+build-backend = "poetry.core.masonry.api"
