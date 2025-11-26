@@ -1,0 +1,25 @@
+# --- Web Framework ---
+fastapi==0.110.1
+uvicorn[standard]==0.29.0
+
+# --- Async Postgres (Supabase/Postgres) ---
+asyncpg==0.29.0
+
+# --- HTTP Client (CRM Integrationen) ---
+httpx==0.27.0
+
+# --- Settings / Validation ---
+pydantic==1.10.14
+python-dotenv==1.0.1
+
+# --- Supabase Client (nur für Scripts, optional für Backend) ---
+supabase==2.4.0
+
+# --- Utilities ---
+pandas==2.2.1
+
+# --- Typing & Tools ---
+typing_extensions==4.10.0
+
+# --- Optional: Wenn du OAuth benötigst (HubSpot / Salesforce) ---
+python-jose==3.3.0
